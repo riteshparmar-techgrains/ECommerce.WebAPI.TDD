@@ -187,7 +187,7 @@ public class OrderServiceTests
         };
 
         _orderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
-        _customerRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(new Customer { Id = 1, Name = "John" });
+        _customerRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(new Customer { Id = 1, Name = "Ritesh" });
         _productRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(new Product { Id = 1, Name = "Laptop", Price = 1000 });
 
         // Act

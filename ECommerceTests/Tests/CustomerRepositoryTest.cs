@@ -24,7 +24,7 @@ namespace ECommerceTests.Tests
             // Arrange
             var context = CreateDbContext();
             var repository = new CustomerRepository(context);
-            var customer = new Customer { Id = 1, Name = "John Doe" };
+            var customer = new Customer { Id = 1, Name = "Ritesh Parmar" };
 
             context.Customers.Add(customer);
             await context.SaveChangesAsync();
