@@ -57,7 +57,7 @@ namespace ECommerceTests.Tests
         }
 
         [Fact]
-        public async Task Create_Should_Return_400_Whlen_InvalidOprationException_Thrown()
+        public async Task Create_Should_Return_400_When_InvalidOprationException_Thrown()
         {
             // Arrange
             var request = new CreateOrderRequest();
