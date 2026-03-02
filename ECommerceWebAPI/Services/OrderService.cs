@@ -1,8 +1,10 @@
 ﻿using Azure.Core;
 using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
+using ECommerceWebAPI.Enums;
 using ECommerceWebAPI.Expection;
 using ECommerceWebAPI.Repository;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerceWebAPI.Services
 {
@@ -11,6 +13,7 @@ namespace ECommerceWebAPI.Services
         private readonly ICustomerRepository _customerRepo;
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;
+        private IOrderRepository @object;
 
         public OrderService(
             ICustomerRepository customerRepo,

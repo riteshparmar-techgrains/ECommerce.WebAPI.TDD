@@ -6,5 +6,6 @@ namespace ECommerceWebAPI.Repository
     {
         Task<int> AddAsync(Order order);
         Task<Order?> GetByIdAsync(int id);
+        Task UpdateAsync(Order order);
     }
 }

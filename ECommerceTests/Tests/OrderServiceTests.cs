@@ -1,5 +1,6 @@
 ﻿using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
+using ECommerceWebAPI.Enums;
 using ECommerceWebAPI.Expection;
 using ECommerceWebAPI.Repository;
 using ECommerceWebAPI.Services;
@@ -11,7 +12,6 @@ public class OrderServiceTests
     private readonly Mock<ICustomerRepository> _customerRepo = new();
     private readonly Mock<IProductRepository> _productRepo = new();
     private readonly Mock<IOrderRepository> _orderRepo = new();
-
     private readonly OrderService _service;
 
     public OrderServiceTests()
@@ -228,4 +228,129 @@ public class OrderServiceTests
     }
 
     // End of GetOrderByIdAsync tests
+
+
+    // Starting to test Update Order Status
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_OrderExists_UpdatesStatus()
+    {
+        var order = new Order { Id = 1, Status = OrderStatus.Pending };
+
+        var mockOrderRepo = new Mock<IOrderRepository>();
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+
+        var service = new OrderStatusService(mockOrderRepo.Object);
+
+        await service.UpdateOrderStatusAsync(1, OrderStatus.Shipped);
+
+        Assert.Equal(OrderStatus.Shipped, order.Status);
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_OrderDoesNotExist_ThrowsNotFoundException()
+    {
+        // Arrange
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(163)).ReturnsAsync((Order)null);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateOrderStatusAsync(163, OrderStatus.Shipped));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_InvalidTransition_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Pending };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Delivered));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_ValidTransition_UpdatesStatus()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Shipped };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act
+        await service.UpdateOrderStatusAsync(1, OrderStatus.Delivered);
+        // Assert
+        Assert.Equal(OrderStatus.Delivered, order.Status);
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_SameStatus_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Pending };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Pending));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_FromDeliveredToShipped_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Delivered };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Shipped));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_FromShippedToPending_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Shipped };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Pending));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_FromPendingToDelivered_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Pending };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Delivered));
+    }
+
+    [Fact]
+    public async Task UpdateOrderStatusAsync_FromDeliveredToPending_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var order = new Order { Id = 1, Status = OrderStatus.Delivered };
+        var mockOrderRepo = new Mock<IOrderRepository>();
+
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+        var service = new OrderStatusService(mockOrderRepo.Object);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Pending));
+    }
 }

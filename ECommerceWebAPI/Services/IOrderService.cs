@@ -1,5 +1,6 @@
 ﻿using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
+using ECommerceWebAPI.Enums;
 
 namespace ECommerceWebAPI.Services
 {
@@ -7,5 +8,6 @@ namespace ECommerceWebAPI.Services
     {
         Task<int> CreateOrderAsync(CreateOrderRequest request);
         Task<Order> GetOrderByIdAsync(int id);
+        Task UpdateOrderStatusAsync(int orderId,OrderStatus newStatus);
     }
 }

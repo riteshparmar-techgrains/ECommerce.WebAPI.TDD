@@ -1,4 +1,6 @@
-﻿namespace ECommerceWebAPI.Entities
+﻿using ECommerceWebAPI.Enums;
+
+namespace ECommerceWebAPI.Entities
 {
     public class Order
     {
@@ -7,5 +9,6 @@
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal TotalAmount { get; set; }
+        public OrderStatus Status { get; set; }
     }
 }

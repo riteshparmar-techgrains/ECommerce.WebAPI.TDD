@@ -1,5 +1,6 @@
 ﻿using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
+using ECommerceWebAPI.Enums;
 using ECommerceWebAPI.Expection;
 using ECommerceWebAPI.Services;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +13,13 @@ namespace ECommerceWebAPI.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _service;
+        private readonly IOrderStatusService _statusService;
 
-        public OrdersController(IOrderService service)
+
+        public OrdersController(IOrderService service, IOrderStatusService statusService)
         {
             _service = service;
+            _statusService = statusService;
         }
 
         [HttpPost]
@@ -57,5 +61,14 @@ namespace ECommerceWebAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderStatus status)
+        {
+            await _statusService.UpdateOrderStatusAsync(id, status);
+            return Ok("Order Status Updated.");
+        }
+
     }
 }

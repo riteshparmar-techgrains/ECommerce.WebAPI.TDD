@@ -23,5 +23,11 @@ namespace ECommerceWebAPI.Repository
         {
             return await _context.Orders.FindAsync(id);
         }
+
+        public async Task UpdateAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
     }
 }

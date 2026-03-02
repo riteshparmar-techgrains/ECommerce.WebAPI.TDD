@@ -14,12 +14,14 @@ namespace ECommerceTests.Tests
     public class OrdersControllerTests
     {
         private readonly Mock<IOrderService> _serviceMock;
+        private readonly Mock<IOrderStatusService> _statusServiceMock;
         private readonly OrdersController _controller;
 
         public OrdersControllerTests()
         {
             _serviceMock = new Mock<IOrderService>();
-            _controller = new OrdersController(_serviceMock.Object);
+            _statusServiceMock = new Mock<IOrderStatusService>();
+            _controller = new OrdersController(_serviceMock.Object,_statusServiceMock.Object);
         }
 
 
