@@ -1,5 +1,7 @@
 ﻿using ECommerceWebAPI.Data;
 using ECommerceWebAPI.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceWebAPI.Repository
 {
@@ -28,6 +30,21 @@ namespace ECommerceWebAPI.Repository
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task CancelOrderAsync(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+                throw new KeyNotFoundException($"Order {id} not found");
+            order.Status = Enums.OrderStatus.Cancelled;
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        {
+            return await _context.Orders.ToListAsync();
         }
     }
 }

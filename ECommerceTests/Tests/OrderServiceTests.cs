@@ -112,7 +112,7 @@ public class OrderServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateOrderAsync(request));
     }
-
+   
     [Fact]
     public async Task CreateOrder_Should_Throw_When_Quantity_Is_Invalid()
     {
@@ -353,4 +353,30 @@ public class OrderServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => service.UpdateOrderStatusAsync(1, OrderStatus.Pending));
     }
+
+    // End of Update Order Status tests
+
+
+    // Starting to test Cancel Order
+
+    [Fact]  
+    public async Task CancelOrderAsync_OrderExistsAndCanBeCancelled_UpdatesStatus()
+    {
+        //Arrange
+        var order = new Order {Id =1, Status = OrderStatus.Pending };
+
+        var mockOrderRepo = new Mock<IOrderRepository>();
+        mockOrderRepo.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(order);
+
+        var service = new OrderStatusService(mockOrderRepo.Object);
+
+        // Act
+        //await service.CancelOrderAsync(1);
+
+        // Assert
+        Assert.Equal(OrderStatus.Cancelled, order.Status);
+
+
+    }
+
 }

@@ -15,7 +15,6 @@ namespace ECommerceWebAPI.Controllers
         private readonly IOrderService _service;
         private readonly IOrderStatusService _statusService;
 
-
         public OrdersController(IOrderService service, IOrderStatusService statusService)
         {
             _service = service;
@@ -62,6 +61,12 @@ namespace ECommerceWebAPI.Controllers
             }
         }
 
+        [HttpGet("GetAllOrders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _service.GetAllOrdersAsync();
+            return Ok(orders);
+        }
 
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderStatus status)

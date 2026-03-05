@@ -4,16 +4,16 @@ using ECommerceWebAPI.Entities;
 using ECommerceWebAPI.Enums;
 using ECommerceWebAPI.Expection;
 using ECommerceWebAPI.Repository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerceWebAPI.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
         private readonly ICustomerRepository _customerRepo;
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;
-        private IOrderRepository @object;
 
         public OrderService(
             ICustomerRepository customerRepo,
@@ -80,6 +80,34 @@ namespace ECommerceWebAPI.Services
             await _productRepo.UpdateAsync(product);
 
             return await _orderRepo.AddAsync(order);
+        }
+
+        public async Task CancelOrderAsync(int id)
+        {
+            var order = await _orderRepo.GetByIdAsync(id);
+
+            if (order == null)
+                throw new NotFoundException($"Order {id} not found");
+
+            if (order.Status != OrderStatus.Pending)
+                throw new InvalidOperationException("Only pending orders can be cancelled");
+
+            if (order.Status == OrderStatus.Cancelled)
+                throw new InvalidOperationException("Order is already cancelled");
+
+            order.Status = OrderStatus.Cancelled;
+
+            await _orderRepo.UpdateAsync(order);
+        }
+
+        public Task UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        {
+            return await _orderRepo.GetAllOrdersAsync();
         }
     }
 }
