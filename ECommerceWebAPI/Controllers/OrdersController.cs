@@ -1,7 +1,7 @@
-﻿using ECommerceWebAPI.DTOs;
+using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
 using ECommerceWebAPI.Enums;
-using ECommerceWebAPI.Expection;
+using ECommerceWebAPI.Exceptions;
 using ECommerceWebAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,11 +36,15 @@ namespace ECommerceWebAPI.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ToProblemDetails(ex.Message, StatusCodes.Status404NotFound));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ToProblemDetails(ex.Message, StatusCodes.Status400BadRequest));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ToProblemDetails(ex.Message, StatusCodes.Status400BadRequest));
             }
         }
 
@@ -52,13 +56,15 @@ namespace ECommerceWebAPI.Controllers
                 var order = await _service.GetOrderByIdAsync(id);
                 return Ok(order);
             }
-            catch (KeyNotFoundException ex)
+            catch (NotFoundException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ToProblemDetails(ex.Message, StatusCodes.Status404NotFound));
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ToProblemDetails("An unexpected error occurred.", StatusCodes.Status500InternalServerError, ex));
             }
         }
 
@@ -66,9 +72,40 @@ namespace ECommerceWebAPI.Controllers
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OrderStatus status)
         {
-            await _statusService.UpdateOrderStatusAsync(id, status);
-            return Ok("Order Status Updated.");
+            try
+            {
+                await _statusService.UpdateOrderStatusAsync(id, status);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ToProblemDetails(ex.Message, StatusCodes.Status404NotFound));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ToProblemDetails(ex.Message, StatusCodes.Status400BadRequest));
+            }
         }
 
+        private static ProblemDetails ToProblemDetails(string detail, int status, Exception? exception = null)
+        {
+            var pd = new ProblemDetails
+            {
+                Status = status,
+                Title = status switch
+                {
+                    StatusCodes.Status400BadRequest => "Bad request",
+                    StatusCodes.Status404NotFound => "Not found",
+                    StatusCodes.Status500InternalServerError => "Internal server error",
+                    _ => "Error"
+                },
+                Detail = detail,
+            };
+
+            if (exception != null)
+                pd.Extensions["traceId"] = exception.GetType().Name;
+
+            return pd;
+        }
     }
 }

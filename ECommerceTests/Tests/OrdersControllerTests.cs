@@ -1,13 +1,12 @@
-﻿using ECommerceWebAPI.Controllers;
+using ECommerceWebAPI.Controllers;
 using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
-using ECommerceWebAPI.Expection;
+using ECommerceWebAPI.Exceptions;
 using ECommerceWebAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ECommerceTests.Tests
 {
@@ -55,7 +54,9 @@ namespace ECommerceTests.Tests
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal("Not found", notFoundResult.Value);
+            var problem = Assert.IsType<ProblemDetails>(notFoundResult.Value);
+            Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
+            Assert.Equal("Not found", problem.Detail);
         }
 
         [Fact]
@@ -71,7 +72,9 @@ namespace ECommerceTests.Tests
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Stock not available", badRequestResult.Value);
+            var problem = Assert.IsType<ProblemDetails>(badRequestResult.Value);
+            Assert.Equal(StatusCodes.Status400BadRequest, problem.Status);
+            Assert.Equal("Stock not available", problem.Detail);
         }
 
         [Fact]
@@ -92,19 +95,21 @@ namespace ECommerceTests.Tests
         }
 
         [Fact]
-        public async Task GetOrderById_Should_Return_404_When_KeyNotFoundException_Is_Thrown()
+        public async Task GetOrderById_Should_Return_404_When_NotFoundException_Is_Thrown()
         {
             // Arrange
             int orderId = 1;
 
-            _serviceMock.Setup(s => s.GetOrderByIdAsync(orderId)).ThrowsAsync(new KeyNotFoundException("Order not found"));
+            _serviceMock.Setup(s => s.GetOrderByIdAsync(orderId)).ThrowsAsync(new NotFoundException("Order not found"));
 
             // Act
             var result = await _controller.GetOrderById(orderId);
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal("Order not found", notFoundResult.Value);
+            var problem = Assert.IsType<ProblemDetails>(notFoundResult.Value);
+            Assert.Equal(StatusCodes.Status404NotFound, problem.Status);
+            Assert.Equal("Order not found", problem.Detail);
         }
 
         [Fact]
@@ -121,7 +126,9 @@ namespace ECommerceTests.Tests
             // Assert
             var statusCodeResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(500, statusCodeResult.StatusCode);
-            Assert.Equal("Database error", statusCodeResult.Value);
+            var problem = Assert.IsType<ProblemDetails>(statusCodeResult.Value);
+            Assert.Equal(StatusCodes.Status500InternalServerError, problem.Status);
+            Assert.Equal("An unexpected error occurred.", problem.Detail);
         }
     }
 }

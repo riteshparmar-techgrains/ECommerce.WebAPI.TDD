@@ -1,7 +1,7 @@
-﻿using ECommerceWebAPI.DTOs;
+using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
 using ECommerceWebAPI.Enums;
-using ECommerceWebAPI.Expection;
+using ECommerceWebAPI.Exceptions;
 using ECommerceWebAPI.Repository;
 using ECommerceWebAPI.Services;
 using Moq;
@@ -83,7 +83,7 @@ public class OrderServiceTests
         };
 
         _customerRepo.Setup(x => x.ExistsAsync(1)).ReturnsAsync(true);
-        _productRepo.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((Product)null);
+        _productRepo.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((Product?)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => _service.CreateOrderAsync(request));
@@ -203,7 +203,7 @@ public class OrderServiceTests
     public async Task GetOrderById_Should_Throw_When_Order_Not_Found()
     {
         // Arrange
-        _orderRepo.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((Order)null);
+        _orderRepo.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((Order?)null);
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => _service.GetOrderByIdAsync(99));
     }
@@ -253,7 +253,7 @@ public class OrderServiceTests
         // Arrange
         var mockOrderRepo = new Mock<IOrderRepository>();
 
-        mockOrderRepo.Setup(x => x.GetByIdAsync(163)).ReturnsAsync((Order)null);
+        mockOrderRepo.Setup(x => x.GetByIdAsync(163)).ReturnsAsync((Order?)null);
         var service = new OrderStatusService(mockOrderRepo.Object);
 
         // Act & Assert

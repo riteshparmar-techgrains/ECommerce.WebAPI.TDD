@@ -1,19 +1,15 @@
-﻿using Azure.Core;
 using ECommerceWebAPI.DTOs;
 using ECommerceWebAPI.Entities;
-using ECommerceWebAPI.Enums;
-using ECommerceWebAPI.Expection;
+using ECommerceWebAPI.Exceptions;
 using ECommerceWebAPI.Repository;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerceWebAPI.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
         private readonly ICustomerRepository _customerRepo;
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;
-        private IOrderRepository @object;
 
         public OrderService(
             ICustomerRepository customerRepo,
@@ -81,5 +77,9 @@ namespace ECommerceWebAPI.Services
 
             return await _orderRepo.AddAsync(order);
         }
+
+        public Task UpdateOrderStatusAsync(int orderId, Enums.OrderStatus newStatus) =>
+            throw new NotSupportedException(
+                $"{nameof(UpdateOrderStatusAsync)} is handled by {nameof(OrderStatusService)}.");
     }
 }

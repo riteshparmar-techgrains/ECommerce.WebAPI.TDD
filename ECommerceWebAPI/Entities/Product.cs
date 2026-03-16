@@ -1,9 +1,9 @@
-﻿namespace ECommerceWebAPI.Entities
+namespace ECommerceWebAPI.Entities
 {
     public class Product
     {
         public int Id { get; set; }
-        public string Name { get; set; } = default!;
+        public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int Stock { get; set; }
     }

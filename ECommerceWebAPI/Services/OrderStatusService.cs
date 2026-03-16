@@ -1,5 +1,5 @@
-﻿using ECommerceWebAPI.Enums;
-using ECommerceWebAPI.Expection;
+using ECommerceWebAPI.Enums;
+using ECommerceWebAPI.Exceptions;
 using ECommerceWebAPI.Repository;
 
 namespace ECommerceWebAPI.Services

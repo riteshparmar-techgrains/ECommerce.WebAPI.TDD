@@ -1,7 +1,7 @@
-﻿namespace ECommerceWebAPI.Expection
+namespace ECommerceWebAPI.Exceptions
 {
     public class NotFoundException : Exception
     {
-        public NotFoundException(string messsage) : base(messsage) { }
+        public NotFoundException(string message) : base(message) { }
     }
 }
